@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <div class="dashboard-container">
+        <h2>Expense Dashboard</h2>
+        <p>Total Expense: ${{ total_expense }}</p>
+        <div style="max-width: 400px; margin: 0 auto;">
+            <canvas id="expenseChart"></canvas>
+            <script>
+                fetch('/expenses-data')
+                    .then(response => response.json())
+                    .then(data => {
+                        var ctx = document.getElementById('expenseChart').getContext('2d');
+                        var expenseChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{
+                                    label: 'Expense Distribution',
+                                    data: data.amounts,
+                                    backgroundColor: generateRandomColors(data.labels.length), // Generate random colors
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true
+                            }
+                        });
+                    });
+
+                // Function to generate random colors
+                function generateRandomColors(numColors) {
+                    var colors = [];
+                    for (var i = 0; i < numColors; i++) {
+                        var randomColor = 'rgba(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ', 0.5)';
+                        colors.push(randomColor);
+                    }
+                    return colors;
+                }
+            </script>
+        </div>
+        <a href="{{ url_for('add_expense') }}" class="btn btn-primary">Add Expense</a>
+        <table class="table mt-3">
+            <thead style="text-align: left;">
+                <tr>
+                    <th>Spent On</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.title }}</td>
+                        <td>{{ expense.amount }}</td>
+                        <td>{{ expense.date_posted.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_expense', expense_id=expense.id) }}" style="margin-right: 10px">
+                                <svg width="28px" height="28px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title></title> <g id="Complete"> <g id="edit"> <g> <path d="M20,16v4a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V6A2,2,0,0,1,4,4H8" fill="none" stroke="#007bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path> <polygon fill="none" points="12.5 15.8 22 6.2 17.8 2 8.3 11.5 8 16 12.5 15.8" stroke="#007bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polygon> </g> </g> </g> </g></svg>
+                            </a>
+                            <form action="{{ url_for('delete_expense', expense_id=expense.id) }}" method="post" style="display: inline; margin-left: 10px">
+                                <button type="submit" style="background-color: transparent; border: none; cursor: pointer">
+                                    <svg fill="#007bff" width="28px" height="28px" viewBox="-3.5 0 19 19" xmlns="http://www.w3.org/2000/svg" class="cf-icon-svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M11.383 13.644A1.03 1.03 0 0 1 9.928 15.1L6 11.172 2.072 15.1a1.03 1.03 0 1 1-1.455-1.456l3.928-3.928L.617 5.79a1.03 1.03 0 1 1 1.455-1.456L6 8.261l3.928-3.928a1.03 1.03 0 0 1 1.455 1.456L7.455 9.716z"></path></g></svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

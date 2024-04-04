@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Add Expense{% endblock %}
+{% block content %}
+    <div class="add-expense-container">
+        <h2>Add Expense</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.title.label }}
+                {{ form.title(class="form-control", placeholder="Enter expense title") }}
+            </div>
+            <div class="form-group">
+                {{ form.amount.label }}
+                {{ form.amount(class="form-control", placeholder="Enter expense amount") }}
+            </div>
+            <button type="submit" class="btn outer-btn">Add</button>
+        </form>
+    </div>
+{% endblock %}
